@@ -47,21 +47,6 @@ function RenderTreeNode({ node }: { node: BookmarkNode }) {
 
 export default function Home() {
     const [bookmarks, setBookmarks] = useState<BookmarkNode[]>([])
-    // useEffect(() => {
-    //   // 页面加载时自动进入全屏
-    //   document.documentElement.requestFullscreen().catch((err) => {
-    //     console.log("无法进入全屏模式:", err);
-    //   });
-
-    //   // 组件卸载时退出全屏
-    //   return () => {
-    //     if (document.fullscreenElement) {
-    //       document.exitFullscreen().catch((err) => {
-    //         console.log("无法退出全屏模式:", err);
-    //       });
-    //     }
-    //   };
-    // }, []);
     const handleImport = (data: BookmarkNode[]) => {
         setBookmarks(data)
     }

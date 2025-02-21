@@ -5,7 +5,7 @@ import { CoolMode } from "@/components/magicui/cool-mode";
 import { TextAnimate } from "@/components/magicui/text-animate";
 export default function CoolModeDemo() {
   return (
-    <div className="w-screen h-screen flex">
+    <div className="flex">
       <CoolMode>
         <Button className="m-auto " variant="secondary">
           <TextAnimate animation="blurInUp" by="character">
