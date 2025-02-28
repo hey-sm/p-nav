@@ -6,7 +6,7 @@ import { File, Folder, Tree } from '@/components/magicui/file-tree'
 import {
     BookmarkImporter,
     type BookmarkNode
-} from '@/components/features/bookmark-importer'
+} from '@/components/custom/bookmark-importer'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
