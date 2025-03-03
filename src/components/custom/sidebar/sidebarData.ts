@@ -30,8 +30,12 @@ export const sidebarData = {
             isActive: true,
             items: [
                 {
-                    title: '文字类',
-                    url: '/css/texts'
+                    title: '文字',
+                    url: '/css/Texts'
+                },
+                {
+                    title: '动画',
+                    url: '/css/Animations'
                 },
                 {
                     title: 'Starred',
@@ -107,6 +111,11 @@ export const sidebarData = {
                     url: '#'
                 }
             ]
+        },
+        {
+            title: 'test',
+            url: '/test',
+            icon: Frame
         }
     ]
 }
