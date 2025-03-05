@@ -5,13 +5,21 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 
-export function Demo() {
+export interface TextFadeInProps {
+    /** 每个字符的动画持续时间（秒） */
+    duration?: number
+    /** 字符之间的延迟时间（秒） */
+    delay?: number
+    /** 要显示的文本内容 */
+    text?: string
+}
+
+export function TextFadeIn({
+    duration = 0.3,
+    delay = 0.02,
+    text = 'Lorem ipsum dolor sit amet consectetur adipisicing elit.'
+}: TextFadeInProps) {
     const [isShowing, setIsShowing] = useState(false)
-
-    const text =
-        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus numquam minus, tempora recusandae incidunt itaque sint delectus perspiciatis dicta laboriosam harum magnam sunt maiores natus amet quas vel non ut!'
-
-    // 将文本拆分成字符数组
     const characters = text.split('')
 
     return (
@@ -23,8 +31,8 @@ export function Demo() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: isShowing ? 1 : 0 }}
                         transition={{
-                            duration: 0.3,
-                            delay: i * 0.02,
+                            duration: duration,
+                            delay: i * delay,
                             ease: 'easeInOut'
                         }}
                         className={`inline-block ${char === ' ' ? 'w-2' : ''}`}

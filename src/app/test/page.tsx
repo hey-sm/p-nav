@@ -1,6 +1,6 @@
 /** @format */
 
-import CodeBlock from '@/components/custom/CodeBlock'
+import CodeBlock from '@/components/custom/previewCode/CodeBlock'
 
 export default function HomePage() {
     const jsCode = `const hello = 'Hello, world!';\nconsole.log(hello);`

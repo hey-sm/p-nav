@@ -72,7 +72,9 @@ export function NavMain({
                                                     href={subItem.url}
                                                     passHref
                                                 >
-                                                    <span>{subItem.title}</span>
+                                                    <span className="text-gray-500">
+                                                        {subItem.title}
+                                                    </span>
                                                 </Link>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
