@@ -31,7 +31,7 @@ export const sidebarData = {
             items: [
                 {
                     title: '文字渐出',
-                    url: '/text-animations/textFadeIn'
+                    url: '/animations/textFadeIn'
                 }
             ]
         },
