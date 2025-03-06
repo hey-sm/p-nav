@@ -1,29 +1,27 @@
 /** @format */
 
-export async function getComponentSource(path: string) {
-    // 移除开头的 @ 或 ./
-    const normalizedPath = path.replace(/^[@./]+/, '')
+export async function loadComponentSource(filePath: string): Promise<string> {
+    if (process.env.NODE_ENV === 'production') {
+        // 在生产环境中从生成的 JSON 文件读取
+        const response = await fetch('/data/source-code.json')
+        const sourceCode = await response.json()
 
-    try {
-        // 使用 Next.js 的方式加载文件
-        const response = await fetch(`/api/source?path=${normalizedPath}`)
+        if (!sourceCode[filePath]) {
+            throw new Error(`Source code not found for: ${filePath}`)
+        }
+
+        return sourceCode[filePath]
+    } else {
+        // 开发环境中直接读取文件
+        const response = await fetch(
+            `/api/source?path=${encodeURIComponent(filePath)}`
+        )
+        const data = await response.json()
+
         if (!response.ok) {
-            throw new Error('Failed to load source code')
+            throw new Error(data.error || 'Failed to load source code')
         }
 
-        const source = await response.text()
-        // 获取文件扩展名作为语言
-        const language = path.split('.').pop() || 'tsx'
-
-        return {
-            code: source,
-            language
-        }
-    } catch (error) {
-        console.error('Error loading component source:', error)
-        return {
-            code: '// Error loading source code',
-            language: 'typescript'
-        }
+        return data.content
     }
 }

@@ -1,38 +1,35 @@
 /** @format */
 
-import { NextResponse } from 'next/server'
-import fs from 'fs/promises'
-import path from 'path'
+import { NextRequest, NextResponse } from 'next/server'
+import * as fs from 'fs/promises'
+import * as path from 'path'
 
-export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url)
+export async function GET(request: NextRequest) {
+    // 只在开发环境中使用
+    if (process.env.NODE_ENV === 'production') {
+        return NextResponse.json(
+            { error: 'This API is only available in development mode' },
+            { status: 403 }
+        )
+    }
+
+    const searchParams = request.nextUrl.searchParams
     const filePath = searchParams.get('path')
 
     if (!filePath) {
-        return NextResponse.json({ error: 'No path provided' }, { status: 400 })
+        return NextResponse.json(
+            { error: 'File path is required' },
+            { status: 400 }
+        )
     }
 
     try {
-        // 获取当前页面的路径
-        const currentPath = request.headers.get('referer') || ''
-        const urlPath = new URL(currentPath).pathname
-        const dirPath = path.join(process.cwd(), 'src/app', urlPath)
-
-        // 构建完整的文件路径
-        const fullPath = path.join(dirPath, filePath)
-
-        console.log('Attempting to read file:', fullPath)
-
-        const source = await fs.readFile(fullPath, 'utf-8')
-        return new NextResponse(source)
+        const absolutePath = path.join(process.cwd(), filePath)
+        const content = await fs.readFile(absolutePath, 'utf-8')
+        return NextResponse.json({ content })
     } catch (error) {
-        console.error('Error reading file:', error)
         return NextResponse.json(
-            {
-                error: 'Failed to read file',
-                details:
-                    error instanceof Error ? error.message : 'Unknown error'
-            },
+            { error: 'Failed to read file', details: (error as Error).message },
             { status: 500 }
         )
     }

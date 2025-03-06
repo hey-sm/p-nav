@@ -32,6 +32,10 @@ export const sidebarData = {
                 {
                     title: '文字渐出',
                     url: '/animations/textFadeIn'
+                },
+                {
+                    title: '水波纹按钮',
+                    url: '/animations/rippleButton'
                 }
             ]
         },

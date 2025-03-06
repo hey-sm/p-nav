@@ -4,67 +4,72 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import CodeBlock from '@/components/custom/previewCode/CodeBlock'
-import { getComponentSource } from '@/lib/utils/loadComponentSource'
 import { useEffect, useState } from 'react'
 
+interface SourceFile {
+    code: string
+    language: string
+    path: string
+}
+
+interface ComponentSource {
+    component: SourceFile
+    example: SourceFile
+}
+
 interface CodePreviewTabsProps {
+    sourceKey: string // 例如: 'animations/textFadeIn'
     children: React.ReactNode
 }
 
-interface SourceState {
-    code: string
-    example: string
-    language: string
-}
-
-export function CodePreviewTabs({ children }: CodePreviewTabsProps) {
-    const [source, setSource] = useState<SourceState>({
-        code: '',
-        example: '',
-        language: 'typescript'
-    })
+export function CodePreviewTabs({ sourceKey, children }: CodePreviewTabsProps) {
+    const [source, setSource] = useState<ComponentSource | null>(null)
 
     useEffect(() => {
         const loadSource = async () => {
-            const componentPath = 'component.tsx'
-            const usePath = 'example.tsx'
+            try {
+                const response = await fetch('/data/source-code.json')
+                const sourceCode = await response.json()
 
-            const [sourceData, useData] = await Promise.all([
-                getComponentSource(componentPath),
-                getComponentSource(usePath)
-            ])
+                if (!sourceCode[sourceKey]) {
+                    throw new Error(`Source code not found for: ${sourceKey}`)
+                }
 
-            setSource({
-                code: sourceData.code,
-                example: useData.code,
-                language: sourceData.language
-            })
+                setSource(sourceCode[sourceKey])
+            } catch (error) {
+                console.error('Error loading source code:', error)
+                setSource(null)
+            }
         }
 
         loadSource()
-    }, [])
+    }, [sourceKey])
 
     return (
         <Tabs defaultValue="preview" className="w-full">
             <TabsList className="grid grid-cols-3">
                 <TabsTrigger value="preview">Preview</TabsTrigger>
-                <TabsTrigger value="code">Code</TabsTrigger>
+                <TabsTrigger value="component">Code</TabsTrigger>
                 <TabsTrigger value="example">Example</TabsTrigger>
             </TabsList>
             <TabsContent value="preview" className="p-4 border rounded-md">
                 {children}
             </TabsContent>
-            <TabsContent value="code" className="p-4 border rounded-md">
-                <CodeBlock
-                    codeString={source.code}
-                    language={source.language}
-                />
+            <TabsContent value="component" className="p-4 border rounded-md">
+                {source && (
+                    <CodeBlock
+                        codeString={source.component.code}
+                        language={source.component.language}
+                    />
+                )}
             </TabsContent>
             <TabsContent value="example" className="p-4 border rounded-md">
-                <CodeBlock
-                    codeString={source.example}
-                    language={source.language}
-                />
+                {source && (
+                    <CodeBlock
+                        codeString={source.example.code}
+                        language={source.example.language}
+                    />
+                )}
             </TabsContent>
         </Tabs>
     )
