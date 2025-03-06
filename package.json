@@ -3,11 +3,11 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev --turbopack",
-        "build": "tsx scripts/generate-source-code.ts && next build",
+        "dev": "next dev",
+        "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "generate-source": "tsx scripts/generate-source-code.ts"
+        "generate-sources": "ts-node scripts/generate-component-sources.ts"
     },
     "dependencies": {
         "@iconify/react": "^5.2.0",
