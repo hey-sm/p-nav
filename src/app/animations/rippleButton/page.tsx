@@ -3,44 +3,12 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import CodeBlock from '@/components/custom/previewCode/CodeBlock'
+import CodeBlock from '@/components/custom/CodeBlock'
 import Demo from './example'
-import { useEffect, useState } from 'react'
-
-interface SourceFile {
-    code: string
-    language: string
-    path: string
-}
-
-interface ComponentSource {
-    component: SourceFile
-    example: SourceFile
-}
+import { useSourceCode } from '@/hooks/useSourceCode'
 
 export default function ExamplePage() {
-    const [source, setSource] = useState<ComponentSource | null>(null)
-    const sourceKey = 'animations/rippleButton'
-
-    useEffect(() => {
-        const loadSource = async () => {
-            try {
-                const response = await fetch('/data/source-code.json')
-                const sourceCode = await response.json()
-
-                if (!sourceCode[sourceKey]) {
-                    throw new Error(`Source code not found for: ${sourceKey}`)
-                }
-
-                setSource(sourceCode[sourceKey])
-            } catch (error) {
-                console.error('Error loading source code:', error)
-                setSource(null)
-            }
-        }
-
-        loadSource()
-    }, [])
+    const source = useSourceCode()
 
     return (
         <div className="container mx-auto p-4 w-4xl">

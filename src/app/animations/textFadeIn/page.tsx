@@ -3,7 +3,7 @@
 'use client'
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import CodeBlock from '@/components/custom/previewCode/CodeBlock'
+import CodeBlock from '@/components/custom/CodeBlock'
 import Demo from './example'
 import { useSourceCode } from '@/hooks/useSourceCode'
 

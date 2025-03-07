@@ -9,22 +9,25 @@ interface SourceFile {
 }
 
 interface ComponentSource {
-    component: SourceFile
-    example: SourceFile
+    [key: string]: SourceFile
 }
 
-export function useSourceCode(componentPath: string) {
+export function useSourceCode() {
     const [source, setSource] = useState<ComponentSource | null>(null)
 
     useEffect(() => {
         const loadSource = async () => {
             try {
-                // 直接从组件目录加载源代码
-                const response = await fetch(
-                    `/animations/${componentPath}/source.json`
-                )
-                const sourceCode = await response.json()
-                setSource(sourceCode)
+                // 从当前路径获取组件路径
+                const path = window.location.pathname.replace(/^\//, '')
+                const response = await fetch(`/api/source?path=${path}`)
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load source')
+                }
+
+                setSource(data)
             } catch (error) {
                 console.error('Error loading source code:', error)
                 setSource(null)
@@ -32,7 +35,7 @@ export function useSourceCode(componentPath: string) {
         }
 
         loadSource()
-    }, [componentPath])
+    }, [])
 
     return source
 }

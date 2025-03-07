@@ -12,4 +12,10 @@ pnpm dev
 bun dev
 ```
 
-使用 pnpm run generate-source 手动生成源代码 JSON
+# 生成组件源代码文件
+
+在开发或构建前运行以下命令生成组件源代码：
+
+```bash
+pnpm generate-sources
+```
