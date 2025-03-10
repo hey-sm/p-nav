@@ -14,7 +14,7 @@ import {
     SidebarHeader,
     SidebarRail
 } from '@/components/ui/sidebar'
-import { sidebarData } from './sidebarData' // 导入数据
+import { sidebarData } from '@/config/navigation'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
