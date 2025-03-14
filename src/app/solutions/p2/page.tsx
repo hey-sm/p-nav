@@ -5,92 +5,37 @@ import { useState, useRef, useEffect } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 
-// 示例数据 - 为每个标签页提供更丰富的内容
+// 示例数据 - 简化后只保留id、title和content
 const sections = [
     {
         id: 'intro',
         title: '介绍',
         content:
-            '这是一个滚动联动标签的示例。当你滚动内容时，活动标签会相应地改变。同样，点击标签也会滚动到相应的部分。',
-        details: [
-            '这个组件展示了如何创建一个滚动联动的标签界面',
-            '当用户滚动右侧内容时，左侧的标签会自动高亮显示当前查看的部分',
-            '这种设计模式在文档网站、教程和长篇内容中特别有用'
-        ],
-        summary:
-            '滚动联动标签是提升用户体验的有效方式，尤其适用于内容丰富的页面。'
+            '这是一个滚动联动标签的示例。当你滚动内容时，活动标签会相应地改变。同样，点击标签也会滚动到相应的部分。'
     },
     {
         id: 'features',
         title: '特性',
         content:
-            '此实现包括平滑滚动、交叉观察和正确的标签高亮。它使用交叉观察器API来检测当前哪个部分在视图中。',
-        details: [
-            '平滑滚动：点击标签时，页面会平滑滚动到相应内容',
-            '交叉观察：使用IntersectionObserver API检测可见内容',
-            '响应式设计：在各种屏幕尺寸上都能良好工作',
-            '可访问性：支持键盘导航和屏幕阅读器'
-        ],
-        summary: '这些特性共同创造了一个流畅、直观的用户体验。'
+            '此实现包括平滑滚动、交叉观察和正确的标签高亮。它使用交叉观察器API来检测当前哪个部分在视图中。'
     },
     {
         id: 'implementation',
         title: '实现方式',
         content:
-            '该实现使用了React钩子，如useRef、useState和useEffect。我们还使用交叉观察器API来检测部分何时进入或离开视口。',
-        details: [
-            'useState：管理当前活动的标签部分',
-            'useRef：引用DOM元素以便观察和滚动',
-            'useEffect：设置和清理交叉观察器',
-            'IntersectionObserver：检测元素何时进入视口'
-        ],
-        code: `useEffect(() => {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        // 更新活动标签
-      }
-    });
-  }, options);
-  
-  // 观察所有部分
-  return () => observer.disconnect();
-}, []);`,
-        summary: '这种实现方式既高效又灵活，可以轻松适应不同的内容结构。'
+            '该实现使用了React钩子，如useRef、useState和useEffect。我们还使用交叉观察器API来检测部分何时进入或离开视口。'
     },
     {
         id: 'customization',
         title: '自定义选项',
         content:
-            '你可以自定义外观、滚动行为和激活标签的阈值。标签栏的样式可以根据项目需求进行调整。',
-        details: [
-            '调整rootMargin参数来控制何时触发标签切换',
-            '修改标签和内容的样式以匹配你的设计系统',
-            '添加动画和过渡效果增强视觉反馈',
-            '调整滚动行为，如滚动速度和对齐方式'
-        ],
-        options: {
-            rootMargin: '-10% 0px -85% 0px',
-            threshold: 0,
-            behavior: 'smooth'
-        },
-        summary: '通过这些自定义选项，你可以使组件完美融入你的应用设计。'
+            '你可以自定义外观、滚动行为和激活标签的阈值。标签栏的样式可以根据项目需求进行调整。'
     },
     {
         id: 'conclusion',
         title: '结论',
         content:
-            '这种模式对于文档站点、长格式内容以及任何你想帮助用户浏览冗长内容的界面都非常有用。',
-        details: [
-            '滚动联动标签提高了长内容的可导航性',
-            '用户可以更容易地理解内容的结构',
-            '这种模式减少了用户的认知负担',
-            '实现相对简单，但效果显著'
-        ],
-        summary:
-            '通过实现滚动联动标签，你可以显著提升用户体验，尤其是在内容丰富的应用中。',
-        nextSteps:
-            '考虑将此模式与其他导航元素结合，如面包屑或进度指示器，以创建更全面的导航体验。'
+            '这种模式对于文档站点、长格式内容以及任何你想帮助用户浏览冗长内容的界面都非常有用。'
     }
 ]
 
@@ -98,14 +43,15 @@ export default function ScrollLinkedTabs() {
     const [activeSection, setActiveSection] = useState(0)
     const sectionRefs = useRef<(HTMLDivElement | null)[]>([])
     const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const componentRef = useRef<HTMLDivElement>(null)
+    const [isInView, setIsInView] = useState(false)
 
-    // 初始化Intersection Observer
+    // 初始化Intersection Observer - 用于检测右侧滚动容器中的哪个部分可见
     useEffect(() => {
         const observers: IntersectionObserver[] = []
-        // 修改rootMargin以更好地检测最后一个元素
         const options = {
             root: scrollContainerRef.current,
-            rootMargin: '-10% 0px -70% 0px', // 调整这个值来更好地检测底部元素
+            rootMargin: '-10% 0px -70% 0px',
             threshold: 0
         }
 
@@ -128,6 +74,91 @@ export default function ScrollLinkedTabs() {
             observers.forEach((observer) => observer.disconnect())
         }
     }, [])
+
+    // 监听组件是否在可视区域内并处理滚动联动
+    useEffect(() => {
+        if (!componentRef.current || !scrollContainerRef.current) return
+
+        // 使用IntersectionObserver检测组件是否在视口中
+        const observer = new IntersectionObserver(
+            (entries) => {
+                // 当组件有一定比例可见时，就启用滚动捕获
+                // 降低阈值到0.3，使组件更容易触发滚动
+                if (
+                    entries[0].isIntersecting &&
+                    entries[0].intersectionRatio >= 0.3
+                ) {
+                    setIsInView(true)
+                } else {
+                    setIsInView(false)
+                }
+            },
+            {
+                // 使用更宽松的阈值配置
+                threshold: [0.1, 0.2, 0.3, 0.4, 0.5]
+            }
+        )
+
+        observer.observe(componentRef.current)
+
+        // 滚动处理函数
+        const handleWheel = (e: WheelEvent) => {
+            // 如果组件不在视口中，不处理滚动
+            if (!isInView) return
+
+            // 获取组件的位置信息
+            const rect = componentRef.current?.getBoundingClientRect()
+            if (!rect) return
+
+            // 检查组件是否在视口中央区域
+            // 使用更宽松的条件，只要组件在视口中部区域就触发滚动
+            const isNearCenter =
+                // 组件顶部位于视口上半部分
+                rect.top <= window.innerHeight * 0.6 &&
+                // 组件底部位于视口下半部分
+                rect.bottom >= window.innerHeight * 0.4
+
+            // 检查鼠标是否在组件区域内或接近组件
+            const isMouseNearComponent =
+                // 鼠标直接在组件内部
+                (e.clientY >= rect.top && e.clientY <= rect.bottom) ||
+                // 或鼠标在组件上方不远处
+                (e.clientY < rect.top && e.clientY >= rect.top - 100) ||
+                // 或鼠标在组件下方不远处
+                (e.clientY > rect.bottom && e.clientY <= rect.bottom + 100)
+
+            // 只要组件接近中心位置，就触发滚动捕获
+            if (isNearCenter) {
+                // 获取滚动容器
+                const container = scrollContainerRef.current
+                if (!container) return
+
+                // 检查是否已滚动到边界
+                const isAtTop = container.scrollTop <= 5
+                const isAtBottom =
+                    container.scrollHeight - container.scrollTop <=
+                    container.clientHeight + 5
+
+                // 如果到达边界并且仍在滚动，允许页面滚动继续
+                if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                    // 不阻止默认滚动，允许页面继续滚动
+                    return
+                }
+
+                // 只有在非边界情况下，才阻止默认滚动并将滚动应用到容器
+                e.preventDefault()
+                container.scrollTop += e.deltaY
+            }
+        }
+
+        // 添加滚动事件监听器
+        window.addEventListener('wheel', handleWheel, { passive: false })
+
+        return () => {
+            observer.disconnect()
+            window.removeEventListener('wheel', handleWheel)
+        }
+    }, [isInView])
 
     // 处理标签点击
     const handleTabClick = (index: number) => {
@@ -156,173 +187,146 @@ export default function ScrollLinkedTabs() {
     }
 
     return (
-        <div className="flex flex-row h-[calc(100vh-4rem)] container mx-auto p-6 gap-6">
-            {/* 左侧标签和内容区域 - 占80% */}
-            <div className="w-[80%] flex flex-col">
-                <h1 className="text-3xl font-bold mb-4">滚动联动标签示例</h1>
-
-                <Tabs
-                    value={String(activeSection)}
-                    className="w-full flex flex-col flex-grow"
-                    onValueChange={(value) => handleTabClick(parseInt(value))}
-                >
-                    {/* 横向标签栏 */}
-                    <TabsList className="flex flex-row h-auto bg-muted/50 p-1 rounded-lg w-full sticky top-0 z-10">
-                        {sections.map((section, index) => (
-                            <TabsTrigger
-                                key={section.id}
-                                value={String(index)}
-                                className={cn(
-                                    'flex-1 px-4 py-3 rounded-md transition-all',
-                                    activeSection === index
-                                        ? 'bg-background text-primary font-medium shadow-sm'
-                                        : 'text-muted-foreground hover:bg-muted'
-                                )}
-                            >
-                                {section.title}
-                            </TabsTrigger>
-                        ))}
-                    </TabsList>
-
-                    {/* 标签内容区域 */}
-                    <div className="mt-6 flex-grow">
-                        {sections.map((section, index) => (
-                            <TabsContent
-                                key={section.id}
-                                value={String(index)}
-                                className="mt-0 h-full"
-                            >
-                                <div className="bg-muted/10 p-6 rounded-lg border border-muted h-full">
-                                    <h2 className="text-2xl font-bold mb-4">
-                                        {section.title}
-                                    </h2>
-                                    <p className="mb-6 text-muted-foreground">
-                                        {section.content}
-                                    </p>
-
-                                    {section.details && (
-                                        <div className="mb-6">
-                                            <h3 className="text-lg font-semibold mb-3">
-                                                主要特点
-                                            </h3>
-                                            <ul className="list-disc pl-5 space-y-2">
-                                                {section.details.map(
-                                                    (detail, i) => (
-                                                        <li
-                                                            key={i}
-                                                            className="text-muted-foreground"
-                                                        >
-                                                            {detail}
-                                                        </li>
-                                                    )
-                                                )}
-                                            </ul>
-                                        </div>
-                                    )}
-
-                                    {section.code && (
-                                        <div className="mb-6">
-                                            <h3 className="text-lg font-semibold mb-3">
-                                                示例代码
-                                            </h3>
-                                            <div className="bg-muted p-4 rounded-md overflow-x-auto">
-                                                <pre className="text-sm">
-                                                    {section.code}
-                                                </pre>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {section.options && (
-                                        <div className="mb-6">
-                                            <h3 className="text-lg font-semibold mb-3">
-                                                配置选项
-                                            </h3>
-                                            <div className="bg-muted/50 p-4 rounded-md">
-                                                <code className="text-sm whitespace-pre">
-                                                    {JSON.stringify(
-                                                        section.options,
-                                                        null,
-                                                        2
-                                                    )}
-                                                </code>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {section.summary && (
-                                        <div className="bg-primary/5 p-4 rounded-md border-l-4 border-primary">
-                                            <h3 className="text-lg font-semibold mb-2">
-                                                总结
-                                            </h3>
-                                            <p className="text-muted-foreground">
-                                                {section.summary}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            </TabsContent>
-                        ))}
+        <div className="min-h-[300vh]">
+            {/* 顶部内容区域 */}
+            <div className="min-h-[100vh] bg-gradient-to-b from-blue-50 to-blue-100 flex items-center justify-center">
+                <div className="text-center max-w-2xl mx-auto p-8">
+                    <h1 className="text-4xl font-bold mb-6">
+                        页面内容顶部区域
+                    </h1>
+                    <p className="text-lg mb-6">
+                        这是页面的顶部区域。向下滚动以查看滚动联动标签组件效果。
+                    </p>
+                    <p className="text-lg mb-6">
+                        滚动联动标签效果将只在组件区域内触发，在此区域前后是普通的页面滚动。
+                    </p>
+                    <div className="border-2 border-blue-300 p-4 rounded-lg">
+                        <p className="text-blue-700">
+                            ↓ 继续向下滚动查看滚动联动标签效果 ↓
+                        </p>
                     </div>
-                </Tabs>
+                </div>
             </div>
 
-            {/* 右侧滚动区域 - 占20% */}
-            <div
-                ref={scrollContainerRef}
-                className="w-[20%] overflow-y-auto border-l pl-6"
-                onScroll={handleScroll}
-            >
-                <div className="space-y-16 pb-10">
-                    {sections.map((section, index) => (
-                        <div
-                            key={section.id}
-                            ref={setRef(index)}
-                            className={cn(
-                                'transition-all duration-300 py-4',
-                                activeSection === index
-                                    ? 'bg-muted/30 rounded-lg px-4 -mx-4'
-                                    : ''
-                            )}
-                            // 为最后一个元素添加额外的底部padding，确保能滚动到足够触发观察器
-                            style={
-                                index === sections.length - 1
-                                    ? { paddingBottom: '100px' }
-                                    : {}
-                            }
-                        >
-                            <h3 className="text-xl font-bold mb-3">
-                                {section.title}
-                            </h3>
-                            <p className="text-muted-foreground">
-                                {section.content}
-                            </p>
+            {/* 滚动联动标签组件区域 - 使用CSS sticky定位 */}
+            <div className="h-[calc(100vh-4rem)] relative">
+                <div
+                    ref={componentRef}
+                    className={cn(
+                        'h-[calc(100vh-4rem)] container mx-auto px-6 py-12',
+                        'sticky top-0 left-0 right-0 z-50',
+                        'transition-all duration-500 ease-in-out',
+                        isInView ? 'bg-blue-50/90 shadow-lg' : 'bg-blue-50/50'
+                    )}
+                >
+                    <div className="flex flex-row h-full gap-6">
+                        {/* 左侧标签和内容区域 - 占80% */}
+                        <div className="w-[80%] flex flex-col">
+                            <h1 className="text-3xl font-bold mb-4">
+                                滚动联动标签示例
+                            </h1>
 
-                            {section.details && (
-                                <div className="mt-4">
-                                    <h4 className="font-medium text-sm text-muted-foreground mb-2">
-                                        主要特点：
-                                    </h4>
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        {section.details.map((detail, i) => (
-                                            <li
-                                                key={i}
-                                                className="text-sm text-muted-foreground"
-                                            >
-                                                {detail}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            <Tabs
+                                value={String(activeSection)}
+                                className="w-full flex flex-col flex-grow"
+                                onValueChange={(value) =>
+                                    handleTabClick(parseInt(value))
+                                }
+                            >
+                                {/* 横向标签栏 */}
+                                <TabsList className="flex flex-row h-auto bg-muted/50 p-1 rounded-lg w-full sticky top-0 z-10">
+                                    {sections.map((section, index) => (
+                                        <TabsTrigger
+                                            key={section.id}
+                                            value={String(index)}
+                                            className={cn(
+                                                'flex-1 px-4 py-3 rounded-md transition-all',
+                                                activeSection === index
+                                                    ? 'bg-background text-primary font-medium shadow-sm'
+                                                    : 'text-muted-foreground hover:bg-muted'
+                                            )}
+                                        >
+                                            {section.title}
+                                        </TabsTrigger>
+                                    ))}
+                                </TabsList>
+
+                                {/* 标签内容区域 */}
+                                <div className="mt-6 flex-grow">
+                                    {sections.map((section, index) => (
+                                        <TabsContent
+                                            key={section.id}
+                                            value={String(index)}
+                                            className="mt-0 h-full"
+                                        >
+                                            <div className="bg-muted/10 p-6 rounded-lg border border-muted h-full">
+                                                <h2 className="text-2xl font-bold mb-4">
+                                                    {section.title}
+                                                </h2>
+                                                <p className="mb-6 text-muted-foreground">
+                                                    {section.content}
+                                                </p>
+                                            </div>
+                                        </TabsContent>
+                                    ))}
                                 </div>
-                            )}
-
-                            {section.summary && (
-                                <p className="mt-4 text-sm font-medium border-l-2 border-primary pl-3 py-1">
-                                    {section.summary}
-                                </p>
-                            )}
+                            </Tabs>
                         </div>
-                    ))}
+
+                        {/* 右侧滚动区域 - 占20% */}
+                        <div
+                            ref={scrollContainerRef}
+                            className="w-[20%] overflow-y-auto border-l pl-6"
+                            onScroll={handleScroll}
+                        >
+                            <div className="space-y-16 pb-10">
+                                {sections.map((section, index) => (
+                                    <div
+                                        key={section.id}
+                                        ref={setRef(index)}
+                                        className={cn(
+                                            'transition-all duration-300 py-4',
+                                            activeSection === index
+                                                ? 'bg-muted/30 rounded-lg px-4 -mx-4'
+                                                : ''
+                                        )}
+                                        style={
+                                            index === sections.length - 1
+                                                ? { paddingBottom: '100px' }
+                                                : {}
+                                        }
+                                    >
+                                        <h3 className="text-xl font-bold mb-3">
+                                            {section.title}
+                                        </h3>
+                                        <p className="text-muted-foreground">
+                                            {section.content}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 底部内容区域 */}
+            <div className="min-h-[100vh] bg-gradient-to-b from-blue-100 to-blue-50 flex items-center justify-center">
+                <div className="text-center max-w-2xl mx-auto p-8">
+                    <h1 className="text-4xl font-bold mb-6">
+                        页面内容底部区域
+                    </h1>
+                    <p className="text-lg mb-6">
+                        这是页面的底部区域。滚动联动标签组件的效果已结束。
+                    </p>
+                    <p className="text-lg mb-6">
+                        您已经体验了滚动联动标签的效果，这种模式在文档、教程和长内容页面中特别有用。
+                    </p>
+                    <div className="border-2 border-blue-300 p-4 rounded-lg">
+                        <p className="text-blue-700">
+                            ↑ 向上滚动再次查看滚动联动标签效果 ↑
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
