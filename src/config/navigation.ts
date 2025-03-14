@@ -43,11 +43,19 @@ export const sidebarData = {
         {
             title: '前端常见问题',
             icon: BookOpen,
-            isActive: false,
+            isActive: true,
             items: [
                 {
                     title: '分页',
-                    url: '/solutions/one'
+                    url: '/solutions/p1 '
+                },
+                {
+                    title: '滚动联动标签',
+                    url: '/solutions/p2'
+                },
+                {
+                    title: '国际化',
+                    url: '/solutions/p3'
                 }
             ]
         },
